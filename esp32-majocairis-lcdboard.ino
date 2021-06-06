@@ -17,6 +17,8 @@ namespace {
 
     lgfx::LGFX_PARALLEL<LGFX_Config> lcd;
     lgfx::Panel_ILI9342 panel;
+
+    lgfx::LGFX_Sprite buf;
 }
 
 void setup()
@@ -48,9 +50,23 @@ void setup()
     lcd.init();
     lcd.setColorDepth(16);
     lcd.setRotation(0);
+
+    buf.setColorDepth(16);
+    buf.createSprite(640, 48);
+    buf.setSwapBytes(true);
+
+    buf.setFont(&fonts::efontJA_16);
+    buf.drawString("hello world", 0, 0);
+    buf.drawString("こんにちは世界", 320, 0);
 }
 
 void loop()
 {
+    writeLcdBuffer();
+}
 
+void writeLcdBuffer()
+{
+    lcd.setAddrWindow(0, 0, 320, 96);
+    lcd.pushPixels((lgfx::swap565_t*) buf.getBuffer(), 640 * 48);
 }
