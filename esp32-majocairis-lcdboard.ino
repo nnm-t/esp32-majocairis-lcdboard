@@ -1,4 +1,7 @@
 #include <LovyanGFX.hpp>
+#include <BLEDevice.h>
+
+#include "ble-message-characteristic-callbacks.h"
 
 namespace {
     struct LGFX_Config {
@@ -19,6 +22,8 @@ namespace {
     lgfx::Panel_ILI9342 panel;
 
     lgfx::LGFX_Sprite buf;
+
+    BLEMessageCharacteristicCallbacks callbacks(buf);
 }
 
 void setup()
@@ -55,14 +60,31 @@ void setup()
     buf.createSprite(640, 48);
     buf.setSwapBytes(true);
 
-    buf.setFont(&fonts::efontJA_16);
-    buf.drawString("hello world", 0, 0);
-    buf.drawString("こんにちは世界", 320, 0);
+    BLEDevice::init("ESP32 Majocairis");
+    BLEServer* pServer = BLEDevice::createServer();
+    BLEService* pService = pServer->createService(BLEUUID(static_cast<uint16_t>(0x6400)));
+    BLECharacteristic* pCharacteristic = pService->createCharacteristic(BLEUUID(static_cast<uint16_t>(0x6401)), BLECharacteristic::PROPERTY_WRITE);
+    pCharacteristic->setCallbacks(&callbacks);
+
+    pService->start();
+
+    BLEAdvertising* pAdvertising = pServer->getAdvertising();
+    BLEAdvertisementData advertisement_data;
+    advertisement_data.setName("ESP32 Majocairis");
+    pAdvertising->setAdvertisementData(advertisement_data);
+    pAdvertising->setScanResponse(true);
+    pAdvertising->setMinPreferred(0x06);
+    pAdvertising->setMinPreferred(0x12);
+    pAdvertising->start();
+
+    buf.setFont(&fonts::efontJA_24);
 }
 
 void loop()
 {
     writeLcdBuffer();
+
+    delay(20);
 }
 
 void writeLcdBuffer()
