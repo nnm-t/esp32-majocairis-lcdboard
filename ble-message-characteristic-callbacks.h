@@ -2,13 +2,14 @@
 
 #include <Arduino.h>
 #include <BLEDevice.h>
-#include <LovyanGFX.hpp>
+
+#include "majoca-lcd.h"
 
 class BLEMessageCharacteristicCallbacks: public BLECharacteristicCallbacks {
-    lgfx::LGFX_Sprite& _buffer;
+    MajocaLCD& _majoca_lcd;
 
 public:
-    BLEMessageCharacteristicCallbacks(lgfx::LGFX_Sprite& buffer) : _buffer(buffer)
+    BLEMessageCharacteristicCallbacks(MajocaLCD& majoca_lcd) : _majoca_lcd(majoca_lcd)
     {
 
     }
