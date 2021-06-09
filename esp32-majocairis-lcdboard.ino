@@ -3,6 +3,7 @@
 
 #include "majoca-lcd.h"
 #include "ble-message-characteristic-callbacks.h"
+#include "ble-clear-characteristic-callbacks.h"
 
 namespace {
     lgfx::LGFX_PARALLEL<LGFX_Config> lcd;
@@ -10,7 +11,12 @@ namespace {
     lgfx::LGFX_Sprite buf;
 
     MajocaLCD majoca_lcd(lcd, buf);
-    BLEMessageCharacteristicCallbacks callbacks(majoca_lcd);
+    BLEMessageCharacteristicCallbacks textCallbacks(majoca_lcd);
+    BLEClearCharacteristicCallbacks clearCallbacks(majoca_lcd);
+
+    BLEDescriptor textDescriptor(BLEUUID(static_cast<uint16_t>(0x2901)));
+    BLEDescriptor rectDescriptor(BLEUUID(static_cast<uint16_t>(0x2901)));
+    BLEDescriptor clearDescriptor(BLEUUID(static_cast<uint16_t>(0x2901)));
 }
 
 void setup()
@@ -42,9 +48,43 @@ void setup()
 
     BLEDevice::init("ESP32 Majocairis");
     BLEServer* pServer = BLEDevice::createServer();
-    BLEService* pService = pServer->createService(BLEUUID(static_cast<uint16_t>(0x6400)));
-    BLECharacteristic* pCharacteristic = pService->createCharacteristic(BLEUUID(static_cast<uint16_t>(0x6401)), BLECharacteristic::PROPERTY_WRITE);
-    pCharacteristic->setCallbacks(&callbacks);
+    BLEService* pService = pServer->createService(BLEUUID(static_cast<uint16_t>(0x6400)), 31);
+
+    // 始点座標
+    BLECharacteristic* pPositionCharacteristic = pService->createCharacteristic(BLEUUID(static_cast<uint16_t>(0x6401)), BLECharacteristic::PROPERTY_WRITE);
+    // 色
+    BLECharacteristic* pForegroundCharacteristic = pService->createCharacteristic(BLEUUID(static_cast<uint16_t>(0x6402)), BLECharacteristic::PROPERTY_WRITE);
+    // 背景色
+    BLECharacteristic* pBackgroundCharacteristic = pService->createCharacteristic(BLEUUID(static_cast<uint16_t>(0x6403)), BLECharacteristic::PROPERTY_WRITE);
+
+    // 文字列
+    BLECharacteristic* pTextCharacteristic = pService->createCharacteristic(BLEUUID(static_cast<uint16_t>(0x6411)), BLECharacteristic::PROPERTY_WRITE);
+    pTextCharacteristic->setCallbacks(&textCallbacks);
+    textDescriptor.setValue("Text");
+    pTextCharacteristic->addDescriptor(&textDescriptor);
+    // 文字列原点
+    BLECharacteristic* pTextDatumCharacteristic = pService->createCharacteristic(BLEUUID(static_cast<uint16_t>(0x6412)), BLECharacteristic::PROPERTY_WRITE);
+
+    // 四角 (サイズ)
+    BLECharacteristic* pRectCharacteristic = pService->createCharacteristic(BLEUUID(static_cast<uint16_t>(0x6421)), BLECharacteristic::PROPERTY_WRITE);
+    rectDescriptor.setValue("Rect");
+    pRectCharacteristic->addDescriptor(&rectDescriptor);
+    // 塗りつぶし四角 (サイズ)
+    BLECharacteristic* pFillRectCharacteristic = pService->createCharacteristic(BLEUUID(static_cast<uint16_t>(0x6422)), BLECharacteristic::PROPERTY_WRITE);
+    // 円 (半径)
+    BLECharacteristic* pCircleCharacteristic = pService->createCharacteristic(BLEUUID(static_cast<uint16_t>(0x6423)), BLECharacteristic::PROPERTY_WRITE);
+    // 円 (終点半径)
+    BLECharacteristic* pFillCircleCharacteristic = pService->createCharacteristic(BLEUUID(static_cast<uint16_t>(0x6424)), BLECharacteristic::PROPERTY_WRITE);
+
+    // 背景塗りつぶし (色)
+    BLECharacteristic* pFillScreenCharacteristic = pService->createCharacteristic(BLEUUID(static_cast<uint16_t>(0x64F1)), BLECharacteristic::PROPERTY_WRITE);
+    // スクロール
+    BLECharacteristic* pScrollCharacteristic = pService->createCharacteristic(BLEUUID(static_cast<uint16_t>(0x64F2)), BLECharacteristic::PROPERTY_WRITE);
+    // 消去
+    BLECharacteristic* pClearCharacteristic = pService->createCharacteristic(BLEUUID(static_cast<uint16_t>(0x64FF)), BLECharacteristic::PROPERTY_WRITE);
+    pClearCharacteristic->setCallbacks(&clearCallbacks);
+    clearDescriptor.setValue("Clear");
+    pClearCharacteristic->addDescriptor(&clearDescriptor);
 
     pService->start();
 

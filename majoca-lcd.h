@@ -25,5 +25,7 @@ public:
 
     void setFont(const lgfx::v0::IFont* font);
 
+    void clear();
+
     void writeLCDBuffer();
 };

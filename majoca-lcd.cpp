@@ -37,6 +37,11 @@ void MajocaLCD::setFont(const lgfx::v0::IFont* font)
     _buf.setFont(font);
 }
 
+void MajocaLCD::clear()
+{
+    _buf.clear();
+}
+
 void MajocaLCD::writeLCDBuffer()
 {
     _lcd.setAddrWindow(0, 0, 320, 96);
