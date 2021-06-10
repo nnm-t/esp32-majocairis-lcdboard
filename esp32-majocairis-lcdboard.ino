@@ -1,9 +1,10 @@
 #include <LovyanGFX.hpp>
 #include <BLEDevice.h>
 
-#include "majoca-lcd.h"
-#include "ble-message-characteristic-callbacks.h"
+#include "ble-text-characteristic-callbacks.h"
+#include "ble-rect-characteristic-callbacks.h"
 #include "ble-clear-characteristic-callbacks.h"
+#include "ble-position-characteristic-callbacks.h"
 
 namespace {
     lgfx::LGFX_PARALLEL<LGFX_Config> lcd;
@@ -11,9 +12,14 @@ namespace {
     lgfx::LGFX_Sprite buf;
 
     MajocaLCD majoca_lcd(lcd, buf);
-    BLEMessageCharacteristicCallbacks textCallbacks(majoca_lcd);
+    MajocaParam majoca_param;
+
+    BLEPositionCharacteristicCallbacks positionCallbacks(majoca_param);
+    BLETextCharacteristicCallbacks textCallbacks(majoca_lcd, majoca_param);
+    BLERectCharacteristicCallbacks rectCallbacks(majoca_lcd, majoca_param);
     BLEClearCharacteristicCallbacks clearCallbacks(majoca_lcd);
 
+    BLEDescriptor positionDescriptor(BLEUUID(static_cast<uint16_t>(0x2901)));
     BLEDescriptor textDescriptor(BLEUUID(static_cast<uint16_t>(0x2901)));
     BLEDescriptor rectDescriptor(BLEUUID(static_cast<uint16_t>(0x2901)));
     BLEDescriptor clearDescriptor(BLEUUID(static_cast<uint16_t>(0x2901)));
@@ -52,6 +58,9 @@ void setup()
 
     // 始点座標
     BLECharacteristic* pPositionCharacteristic = pService->createCharacteristic(BLEUUID(static_cast<uint16_t>(0x6401)), BLECharacteristic::PROPERTY_WRITE);
+    pPositionCharacteristic->setCallbacks(&positionCallbacks);
+    positionDescriptor.setValue("Position");
+    pPositionCharacteristic->addDescriptor(&positionDescriptor);
     // 色
     BLECharacteristic* pForegroundCharacteristic = pService->createCharacteristic(BLEUUID(static_cast<uint16_t>(0x6402)), BLECharacteristic::PROPERTY_WRITE);
     // 背景色
@@ -67,6 +76,7 @@ void setup()
 
     // 四角 (サイズ)
     BLECharacteristic* pRectCharacteristic = pService->createCharacteristic(BLEUUID(static_cast<uint16_t>(0x6421)), BLECharacteristic::PROPERTY_WRITE);
+    pRectCharacteristic->setCallbacks(&rectCallbacks);
     rectDescriptor.setValue("Rect");
     pRectCharacteristic->addDescriptor(&rectDescriptor);
     // 塗りつぶし四角 (サイズ)
@@ -102,6 +112,12 @@ void setup()
     String mac_address(BLEDevice::getAddress().toString().c_str());
 
     majoca_lcd.drawString("MAC=" + mac_address, 0, 0);
+
+    String esp_chip_model(ESP.getChipModel());
+    String esp_frequency(ESP.getCpuFreqMHz(), DEC);
+    String esp_flash_size(ESP.getFlashChipSize() / 1024, DEC);
+    majoca_lcd.drawString(esp_chip_model + " / " + esp_frequency + "MHz / " + esp_flash_size + "KB", 0, 24);
+
     majoca_lcd.writeLCDBuffer();
 }
 

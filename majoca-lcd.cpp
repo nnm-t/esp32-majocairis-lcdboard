@@ -37,6 +37,11 @@ void MajocaLCD::setFont(const lgfx::v0::IFont* font)
     _buf.setFont(font);
 }
 
+void MajocaLCD::drawRect(const int32_t x, const int32_t y, const int32_t w, const int32_t h)
+{
+    _buf.drawRect(x, y, w, h);
+}
+
 void MajocaLCD::clear()
 {
     _buf.clear();
