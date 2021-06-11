@@ -2,6 +2,7 @@
 #include <BLEDevice.h>
 
 #include "ble-text-characteristic-callbacks.h"
+#include "ble-background-characteristic-callbacks.h"
 #include "ble-rect-characteristic-callbacks.h"
 #include "ble-clear-characteristic-callbacks.h"
 #include "ble-position-characteristic-callbacks.h"
@@ -15,11 +16,13 @@ namespace {
     MajocaParam majoca_param;
 
     BLEPositionCharacteristicCallbacks positionCallbacks(majoca_param);
+    BLEBackgroundCharacteristicCallbacks backgroundCallbacks(majoca_param);
     BLETextCharacteristicCallbacks textCallbacks(majoca_lcd, majoca_param);
     BLERectCharacteristicCallbacks rectCallbacks(majoca_lcd, majoca_param);
     BLEClearCharacteristicCallbacks clearCallbacks(majoca_lcd);
 
     BLEDescriptor positionDescriptor(BLEUUID(static_cast<uint16_t>(0x2901)));
+    BLEDescriptor backgroundDescriptor(BLEUUID(static_cast<uint16_t>(0x2901)));
     BLEDescriptor textDescriptor(BLEUUID(static_cast<uint16_t>(0x2901)));
     BLEDescriptor rectDescriptor(BLEUUID(static_cast<uint16_t>(0x2901)));
     BLEDescriptor clearDescriptor(BLEUUID(static_cast<uint16_t>(0x2901)));
@@ -65,6 +68,9 @@ void setup()
     BLECharacteristic* pForegroundCharacteristic = pService->createCharacteristic(BLEUUID(static_cast<uint16_t>(0x6402)), BLECharacteristic::PROPERTY_WRITE);
     // 背景色
     BLECharacteristic* pBackgroundCharacteristic = pService->createCharacteristic(BLEUUID(static_cast<uint16_t>(0x6403)), BLECharacteristic::PROPERTY_WRITE);
+    pBackgroundCharacteristic->setCallbacks(&backgroundCallbacks);
+    backgroundDescriptor.setValue("Background");
+    pBackgroundCharacteristic->addDescriptor(&backgroundDescriptor);
 
     // 文字列
     BLECharacteristic* pTextCharacteristic = pService->createCharacteristic(BLEUUID(static_cast<uint16_t>(0x6411)), BLECharacteristic::PROPERTY_WRITE);

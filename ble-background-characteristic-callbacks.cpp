@@ -1,0 +1,14 @@
+#include "ble-background-characteristic-callbacks.h"
+
+void BLEBackgroundCharacteristicCallbacks::onRead(BLECharacteristic* pCharacteristic)
+{
+    uint32_t color = _majoca_param.getBackground();
+    pCharacteristic->setValue(color);
+}
+
+void BLEBackgroundCharacteristicCallbacks::onWrite(BLECharacteristic* pCharacteristic)
+{
+    uint8_t* value = pCharacteristic->getData();
+    const uint32_t color = (value[0] << 16) + (value[1] << 8) + value[2];
+    _majoca_param.setBackground(color);
+}
