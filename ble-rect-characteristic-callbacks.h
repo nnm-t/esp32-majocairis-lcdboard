@@ -2,18 +2,16 @@
 
 #include <Arduino.h>
 #include <BLEDevice.h>
-#include <LovyanGFX.hpp>
 
 #include "majoca-lcd.h"
-#include "majoca-param.h"
+#include "ble-coordinate-characteristic-callbacks.h"
 
-class BLERectCharacteristicCallbacks : public BLECharacteristicCallbacks
+class BLERectCharacteristicCallbacks : public BLECoordinateCharacteristicCallbacks
 {
     MajocaLCD& _majoca_lcd;
-    MajocaParam& _majoca_param;
 
 public:
-    BLERectCharacteristicCallbacks(MajocaLCD& majoca_lcd, MajocaParam& majoca_param) : _majoca_lcd(majoca_lcd), _majoca_param(majoca_param)
+    BLERectCharacteristicCallbacks(MajocaLCD& majoca_lcd, MajocaParam& majoca_param) : BLECoordinateCharacteristicCallbacks(majoca_param), _majoca_lcd(majoca_lcd)
     {
 
     }

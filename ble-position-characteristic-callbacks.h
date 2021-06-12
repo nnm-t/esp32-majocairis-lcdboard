@@ -2,16 +2,13 @@
 
 #include <Arduino.h>
 #include <BLEDevice.h>
-#include <LovyanGFX.hpp>
 
-#include "majoca-param.h"
+#include "ble-coordinate-characteristic-callbacks.h"
 
-class BLEPositionCharacteristicCallbacks : public BLECharacteristicCallbacks
+class BLEPositionCharacteristicCallbacks : public BLECoordinateCharacteristicCallbacks
 {
-    MajocaParam& _majoca_param;
-
 public:
-    BLEPositionCharacteristicCallbacks(MajocaParam& majoca_param) : _majoca_param(majoca_param)
+    BLEPositionCharacteristicCallbacks(MajocaParam& majoca_param) : BLECoordinateCharacteristicCallbacks(majoca_param)
     {
 
     }
