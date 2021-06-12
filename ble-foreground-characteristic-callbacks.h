@@ -5,10 +5,10 @@
 
 #include "ble-color-characteristic-callbacks.h"
 
-class BLEBackgroundCharacteristicCallbacks : public BLEColorCharacteristicCallbacks
+class BLEForegroundCharacteristicCallbacks : public BLEColorCharacteristicCallbacks
 {
 public:
-    BLEBackgroundCharacteristicCallbacks(MajocaParam& majoca_param) : BLEColorCharacteristicCallbacks(majoca_param)
+    BLEForegroundCharacteristicCallbacks(MajocaParam& majoca_param) : BLEColorCharacteristicCallbacks(majoca_param)
     {
 
     }

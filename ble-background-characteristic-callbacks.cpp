@@ -9,6 +9,6 @@ void BLEBackgroundCharacteristicCallbacks::onRead(BLECharacteristic* pCharacteri
 void BLEBackgroundCharacteristicCallbacks::onWrite(BLECharacteristic* pCharacteristic)
 {
     uint8_t* value = pCharacteristic->getData();
-    const uint32_t color = (value[0] << 16) + (value[1] << 8) + value[2];
+    const uint32_t color = valueToColor32(value);
     _majoca_param.setBackground(color);
 }
