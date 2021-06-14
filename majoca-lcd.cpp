@@ -42,6 +42,16 @@ void MajocaLCD::drawRect(const int32_t x, const int32_t y, const int32_t w, cons
     _buf.drawRect(x, y, w, h);
 }
 
+void MajocaLCD::fillRect(const int32_t x, const int32_t y, const int32_t w, const int32_t h)
+{
+    _buf.fillRect(x, y, w, h);
+}
+
+void MajocaLCD::fillScreen(const uint32_t color)
+{
+    _buf.fillScreen(color);
+}
+
 void MajocaLCD::clear()
 {
     _buf.clear();

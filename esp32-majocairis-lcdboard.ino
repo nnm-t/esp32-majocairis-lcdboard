@@ -5,6 +5,8 @@
 #include "ble-background-characteristic-callbacks.h"
 #include "ble-foreground-characteristic-callbacks.h"
 #include "ble-rect-characteristic-callbacks.h"
+#include "ble-fill-rect-characteristic-callbacks.h"
+#include "ble-fill-screen-characteristic-callbacks.h"
 #include "ble-clear-characteristic-callbacks.h"
 #include "ble-position-characteristic-callbacks.h"
 
@@ -21,6 +23,8 @@ namespace {
     BLEBackgroundCharacteristicCallbacks backgroundCallbacks(majoca_param);
     BLETextCharacteristicCallbacks textCallbacks(majoca_lcd, majoca_param);
     BLERectCharacteristicCallbacks rectCallbacks(majoca_lcd, majoca_param);
+    BLEFillRectCharacteristicCallbacks fillRectCallbacks(majoca_lcd, majoca_param);
+    BLEFillScreenCharacteristicCallbacks fillScreenCallbacks(majoca_lcd, majoca_param);
     BLEClearCharacteristicCallbacks clearCallbacks(majoca_lcd);
 
     BLEDescriptor positionDescriptor(BLEUUID(static_cast<uint16_t>(0x2901)));
@@ -28,6 +32,8 @@ namespace {
     BLEDescriptor backgroundDescriptor(BLEUUID(static_cast<uint16_t>(0x2901)));
     BLEDescriptor textDescriptor(BLEUUID(static_cast<uint16_t>(0x2901)));
     BLEDescriptor rectDescriptor(BLEUUID(static_cast<uint16_t>(0x2901)));
+    BLEDescriptor fillRectDescriptor(BLEUUID(static_cast<uint16_t>(0x2901)));
+    BLEDescriptor fillScreenDesceriptor(BLEUUID(static_cast<uint16_t>(0x2901)));
     BLEDescriptor clearDescriptor(BLEUUID(static_cast<uint16_t>(0x2901)));
 }
 
@@ -93,6 +99,9 @@ void setup()
     pRectCharacteristic->addDescriptor(&rectDescriptor);
     // 塗りつぶし四角 (サイズ)
     BLECharacteristic* pFillRectCharacteristic = pService->createCharacteristic(BLEUUID(static_cast<uint16_t>(0x6422)), BLECharacteristic::PROPERTY_WRITE);
+    pFillRectCharacteristic->setCallbacks(&fillRectCallbacks);
+    fillRectDescriptor.setValue("Fill Rect");
+    pFillRectCharacteristic->addDescriptor(&fillRectDescriptor);
     // 円 (半径)
     BLECharacteristic* pCircleCharacteristic = pService->createCharacteristic(BLEUUID(static_cast<uint16_t>(0x6423)), BLECharacteristic::PROPERTY_WRITE);
     // 円 (終点半径)
@@ -100,6 +109,9 @@ void setup()
 
     // 背景塗りつぶし (色)
     BLECharacteristic* pFillScreenCharacteristic = pService->createCharacteristic(BLEUUID(static_cast<uint16_t>(0x64F1)), BLECharacteristic::PROPERTY_WRITE);
+    pFillScreenCharacteristic->setCallbacks(&fillScreenCallbacks);
+    fillScreenDesceriptor.setValue("Fill Screen");
+    pFillScreenCharacteristic->addDescriptor(&fillScreenDesceriptor);
     // スクロール
     BLECharacteristic* pScrollCharacteristic = pService->createCharacteristic(BLEUUID(static_cast<uint16_t>(0x64F2)), BLECharacteristic::PROPERTY_WRITE);
     // 消去

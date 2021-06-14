@@ -26,6 +26,9 @@ public:
     void setFont(const lgfx::v0::IFont* font);
 
     void drawRect(const int32_t x, const int32_t y, const int32_t w, const int32_t h);
+    void fillRect(const int32_t x, const int32_t y, const int32_t w, const int32_t h);
+
+    void fillScreen(const uint32_t color);
 
     void clear();
 
