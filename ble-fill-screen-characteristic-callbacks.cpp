@@ -4,4 +4,5 @@ void BLEFillScreenCharacteristicCallbacks::onWrite(BLECharacteristic* pCharacter
 {
     uint8_t* value = pCharacteristic->getData();
     _majoca_lcd.fillScreen(valueToColor32(value));
+    _majoca_lcd.writeLCDBuffer();
 }

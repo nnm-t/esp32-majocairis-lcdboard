@@ -2,6 +2,7 @@
 #include <BLEDevice.h>
 
 #include "ble-text-characteristic-callbacks.h"
+#include "ble-text-datum-characteristic-callbacks.h"
 #include "ble-background-characteristic-callbacks.h"
 #include "ble-foreground-characteristic-callbacks.h"
 #include "ble-rect-characteristic-callbacks.h"
@@ -22,6 +23,7 @@ namespace {
     BLEForegroundCharacteristicCallbacks foregroundCallbacks(majoca_param);
     BLEBackgroundCharacteristicCallbacks backgroundCallbacks(majoca_param);
     BLETextCharacteristicCallbacks textCallbacks(majoca_lcd, majoca_param);
+    BLETextDatumCharacteristicCallbacks textDatumCallbacks(majoca_lcd);
     BLERectCharacteristicCallbacks rectCallbacks(majoca_lcd, majoca_param);
     BLEFillRectCharacteristicCallbacks fillRectCallbacks(majoca_lcd, majoca_param);
     BLEFillScreenCharacteristicCallbacks fillScreenCallbacks(majoca_lcd, majoca_param);
@@ -31,6 +33,7 @@ namespace {
     BLEDescriptor foregroundDescriptor(BLEUUID(static_cast<uint16_t>(0x2901)));
     BLEDescriptor backgroundDescriptor(BLEUUID(static_cast<uint16_t>(0x2901)));
     BLEDescriptor textDescriptor(BLEUUID(static_cast<uint16_t>(0x2901)));
+    BLEDescriptor textDatumDescriptor(BLEUUID(static_cast<uint16_t>(0x2901)));
     BLEDescriptor rectDescriptor(BLEUUID(static_cast<uint16_t>(0x2901)));
     BLEDescriptor fillRectDescriptor(BLEUUID(static_cast<uint16_t>(0x2901)));
     BLEDescriptor fillScreenDesceriptor(BLEUUID(static_cast<uint16_t>(0x2901)));
@@ -91,6 +94,9 @@ void setup()
     pTextCharacteristic->addDescriptor(&textDescriptor);
     // 文字列原点
     BLECharacteristic* pTextDatumCharacteristic = pService->createCharacteristic(BLEUUID(static_cast<uint16_t>(0x6412)), BLECharacteristic::PROPERTY_WRITE);
+    pTextDatumCharacteristic->setCallbacks(&textDatumCallbacks);
+    textDatumDescriptor.setValue("Text Datum");
+    pTextDatumCharacteristic->addDescriptor(&textDatumDescriptor);
 
     // 四角 (サイズ)
     BLECharacteristic* pRectCharacteristic = pService->createCharacteristic(BLEUUID(static_cast<uint16_t>(0x6421)), BLECharacteristic::PROPERTY_WRITE);

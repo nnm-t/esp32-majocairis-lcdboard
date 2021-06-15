@@ -32,6 +32,11 @@ void MajocaLCD::drawString(StringSumHelper string, int32_t x, int32_t y)
     _buf.drawString(string, x, y);
 }
 
+void MajocaLCD::setTextDatum(const uint8_t datum)
+{
+    _buf.setTextDatum(datum);
+}
+
 void MajocaLCD::setFont(const lgfx::v0::IFont* font)
 {
     _buf.setFont(font);

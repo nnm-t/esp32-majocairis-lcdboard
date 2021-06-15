@@ -23,6 +23,7 @@ public:
     void drawString(String string, int32_t x, int32_t y);
     void drawString(StringSumHelper string, int32_t x, int32_t y);
 
+    void setTextDatum(const uint8_t datum);
     void setFont(const lgfx::v0::IFont* font);
 
     void drawRect(const int32_t x, const int32_t y, const int32_t w, const int32_t h);
