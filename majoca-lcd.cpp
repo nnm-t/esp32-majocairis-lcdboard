@@ -52,6 +52,16 @@ void MajocaLCD::fillRect(const int32_t x, const int32_t y, const int32_t w, cons
     _buf.fillRect(x, y, w, h);
 }
 
+void MajocaLCD::drawCircle(const int32_t x, const int32_t y, const int32_t r)
+{
+    _buf.drawCircle(x, r, r);
+}
+
+void MajocaLCD::fillCircle(const int32_t x, const int32_t y, const int32_t r)
+{
+    _buf.fillCircle(x, r, r);
+}
+
 void MajocaLCD::fillScreen(const uint32_t color)
 {
     _buf.fillScreen(color);

@@ -1,15 +1,17 @@
 #include <LovyanGFX.hpp>
 #include <BLEDevice.h>
 
-#include "ble-text-characteristic-callbacks.h"
-#include "ble-text-datum-characteristic-callbacks.h"
+#include "ble-position-characteristic-callbacks.h"
 #include "ble-background-characteristic-callbacks.h"
 #include "ble-foreground-characteristic-callbacks.h"
+#include "ble-text-characteristic-callbacks.h"
+#include "ble-text-datum-characteristic-callbacks.h"
 #include "ble-rect-characteristic-callbacks.h"
 #include "ble-fill-rect-characteristic-callbacks.h"
 #include "ble-fill-screen-characteristic-callbacks.h"
+#include "ble-circle-characteristic-callbacks.h"
+#include "ble-fill-circle-characteristic-callbacks.h"
 #include "ble-clear-characteristic-callbacks.h"
-#include "ble-position-characteristic-callbacks.h"
 
 namespace {
     lgfx::LGFX_PARALLEL<LGFX_Config> lcd;
@@ -26,18 +28,24 @@ namespace {
     BLETextDatumCharacteristicCallbacks textDatumCallbacks(majoca_lcd);
     BLERectCharacteristicCallbacks rectCallbacks(majoca_lcd, majoca_param);
     BLEFillRectCharacteristicCallbacks fillRectCallbacks(majoca_lcd, majoca_param);
+    BLECircleCharacteristicCallbacks circleCallbacks(majoca_lcd, majoca_param);
+    BLEFillCircleCharacteristicCallbacks fillCircleCallbacks(majoca_lcd, majoca_param);
     BLEFillScreenCharacteristicCallbacks fillScreenCallbacks(majoca_lcd, majoca_param);
     BLEClearCharacteristicCallbacks clearCallbacks(majoca_lcd);
 
-    BLEDescriptor positionDescriptor(BLEUUID(static_cast<uint16_t>(0x2901)));
-    BLEDescriptor foregroundDescriptor(BLEUUID(static_cast<uint16_t>(0x2901)));
-    BLEDescriptor backgroundDescriptor(BLEUUID(static_cast<uint16_t>(0x2901)));
-    BLEDescriptor textDescriptor(BLEUUID(static_cast<uint16_t>(0x2901)));
-    BLEDescriptor textDatumDescriptor(BLEUUID(static_cast<uint16_t>(0x2901)));
-    BLEDescriptor rectDescriptor(BLEUUID(static_cast<uint16_t>(0x2901)));
-    BLEDescriptor fillRectDescriptor(BLEUUID(static_cast<uint16_t>(0x2901)));
-    BLEDescriptor fillScreenDesceriptor(BLEUUID(static_cast<uint16_t>(0x2901)));
-    BLEDescriptor clearDescriptor(BLEUUID(static_cast<uint16_t>(0x2901)));
+    BLEUUID descriptorUUID(static_cast<uint16_t>(0x2901));
+
+    BLEDescriptor positionDescriptor(descriptorUUID);
+    BLEDescriptor foregroundDescriptor(descriptorUUID);
+    BLEDescriptor backgroundDescriptor(descriptorUUID);
+    BLEDescriptor textDescriptor(descriptorUUID);
+    BLEDescriptor textDatumDescriptor(descriptorUUID);
+    BLEDescriptor rectDescriptor(descriptorUUID);
+    BLEDescriptor fillRectDescriptor(descriptorUUID);
+    BLEDescriptor circleDescriptor(descriptorUUID);
+    BLEDescriptor fillCircleDescriptor(descriptorUUID);
+    BLEDescriptor fillScreenDesceriptor(descriptorUUID);
+    BLEDescriptor clearDescriptor(descriptorUUID);
 }
 
 void setup()
@@ -65,8 +73,6 @@ void setup()
     panel.rotation = 0;
     panel.offset_rotation = 0;
 
-    majoca_lcd.init(panel);
-
     BLEDevice::init("ESP32 Majocairis");
     BLEServer* pServer = BLEDevice::createServer();
     BLEService* pService = pServer->createService(BLEUUID(static_cast<uint16_t>(0x6400)), 31);
@@ -77,12 +83,12 @@ void setup()
     positionDescriptor.setValue("Position");
     pPositionCharacteristic->addDescriptor(&positionDescriptor);
     // 色
-    BLECharacteristic* pForegroundCharacteristic = pService->createCharacteristic(BLEUUID(static_cast<uint16_t>(0x6402)), BLECharacteristic::PROPERTY_WRITE);
+    BLECharacteristic* pForegroundCharacteristic = pService->createCharacteristic(BLEUUID(static_cast<uint16_t>(0x6402)), BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_WRITE);
     pForegroundCharacteristic->setCallbacks(&foregroundCallbacks);
     foregroundDescriptor.setValue("Foreground");
     pForegroundCharacteristic->addDescriptor(&foregroundDescriptor);
     // 背景色
-    BLECharacteristic* pBackgroundCharacteristic = pService->createCharacteristic(BLEUUID(static_cast<uint16_t>(0x6403)), BLECharacteristic::PROPERTY_WRITE);
+    BLECharacteristic* pBackgroundCharacteristic = pService->createCharacteristic(BLEUUID(static_cast<uint16_t>(0x6403)), BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_WRITE);
     pBackgroundCharacteristic->setCallbacks(&backgroundCallbacks);
     backgroundDescriptor.setValue("Background");
     pBackgroundCharacteristic->addDescriptor(&backgroundDescriptor);
@@ -93,7 +99,7 @@ void setup()
     textDescriptor.setValue("Text");
     pTextCharacteristic->addDescriptor(&textDescriptor);
     // 文字列原点
-    BLECharacteristic* pTextDatumCharacteristic = pService->createCharacteristic(BLEUUID(static_cast<uint16_t>(0x6412)), BLECharacteristic::PROPERTY_WRITE);
+    BLECharacteristic* pTextDatumCharacteristic = pService->createCharacteristic(BLEUUID(static_cast<uint16_t>(0x6412)), BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_WRITE);
     pTextDatumCharacteristic->setCallbacks(&textDatumCallbacks);
     textDatumDescriptor.setValue("Text Datum");
     pTextDatumCharacteristic->addDescriptor(&textDatumDescriptor);
@@ -110,16 +116,20 @@ void setup()
     pFillRectCharacteristic->addDescriptor(&fillRectDescriptor);
     // 円 (半径)
     BLECharacteristic* pCircleCharacteristic = pService->createCharacteristic(BLEUUID(static_cast<uint16_t>(0x6423)), BLECharacteristic::PROPERTY_WRITE);
+    pCircleCharacteristic->setCallbacks(&circleCallbacks);
+    circleDescriptor.setValue("Circle");
+    pCircleCharacteristic->addDescriptor(&circleDescriptor);
     // 円 (終点半径)
     BLECharacteristic* pFillCircleCharacteristic = pService->createCharacteristic(BLEUUID(static_cast<uint16_t>(0x6424)), BLECharacteristic::PROPERTY_WRITE);
+    pFillCircleCharacteristic->setCallbacks(&fillCircleCallbacks);
+    fillCircleDescriptor.setValue("Fill Circle");
+    pFillCircleCharacteristic->addDescriptor(&fillCircleDescriptor);
 
     // 背景塗りつぶし (色)
     BLECharacteristic* pFillScreenCharacteristic = pService->createCharacteristic(BLEUUID(static_cast<uint16_t>(0x64F1)), BLECharacteristic::PROPERTY_WRITE);
     pFillScreenCharacteristic->setCallbacks(&fillScreenCallbacks);
     fillScreenDesceriptor.setValue("Fill Screen");
     pFillScreenCharacteristic->addDescriptor(&fillScreenDesceriptor);
-    // スクロール
-    BLECharacteristic* pScrollCharacteristic = pService->createCharacteristic(BLEUUID(static_cast<uint16_t>(0x64F2)), BLECharacteristic::PROPERTY_WRITE);
     // 消去
     BLECharacteristic* pClearCharacteristic = pService->createCharacteristic(BLEUUID(static_cast<uint16_t>(0x64FF)), BLECharacteristic::PROPERTY_WRITE);
     pClearCharacteristic->setCallbacks(&clearCallbacks);
@@ -137,6 +147,7 @@ void setup()
     pAdvertising->setMinPreferred(0x12);
     pAdvertising->start();
 
+    majoca_lcd.init(panel);
     majoca_lcd.setFont(&fonts::efontJA_24);
 
     String mac_address(BLEDevice::getAddress().toString().c_str());
